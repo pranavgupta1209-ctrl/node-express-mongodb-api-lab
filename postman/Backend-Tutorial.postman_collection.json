@@ -1,0 +1,309 @@
+{
+  "info": {
+    "name": "Backend Tutorial - Node Express MongoDB API Lab",
+    "description": "Run these seven requests in order against your own local server connected to Atlas. These are fictitious academic examples, not real account credentials. Register returns 409 if you already used the same username/email: change both values for another run and use the new email in Login. Create Post saves post._id in the collection variable postId. To set it manually, copy post._id from Create Post, open this collection > Variables, paste into postId, and save. Update and Delete use {{postId}}. Login verifies credentials without creating a session; logout is a demonstration. Posts are publicly accessible in this educational API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "postId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/users/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "users",
+            "register"
+          ]
+        },
+        "description": "Create a new user. A repeated username or email correctly returns 409. The sample password is fictitious and should not be reused outside this exercise.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"studentdemo\",\n  \"email\": \"student@example.com\",\n  \"password\": \"DemoPass123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.test('No password or hash returned', () => { const user = pm.response.json().user; pm.expect(user).not.to.have.property('password'); pm.expect(JSON.stringify(user)).not.to.match(/\\$2[aby]\\$/); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "2. Login User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/users/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "users",
+            "login"
+          ]
+        },
+        "description": "Verify the registered credentials. No JWT, cookie or persistent session is created.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"DemoPass123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('No password or hash returned', () => { const user = pm.response.json().user; pm.expect(user).not.to.have.property('password'); pm.expect(JSON.stringify(user)).not.to.match(/\\$2[aby]\\$/); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "3. Logout User",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/users/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "users",
+            "logout"
+          ]
+        },
+        "description": "Send with no body. This educational endpoint has no session or token to invalidate."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "4. Create Post",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/posts/create",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "posts",
+            "create"
+          ]
+        },
+        "description": "Create a post. The post-response test automatically stores post._id as the collection variable postId.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Backend Learning\",\n  \"description\": \"My first MongoDB API project\",\n  \"age\": 20\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.test('Post ID is returned', () => pm.expect(pm.response.json().post._id).to.match(/^[a-f0-9]{24}$/i));",
+              "if (pm.response.code === 201) { pm.collectionVariables.set('postId', pm.response.json().post._id); }"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "5. Get All Posts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/posts/getPosts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "posts",
+            "getPosts"
+          ]
+        },
+        "description": "Returns a JSON array, including [] when no posts exist."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response is an array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "6. Update Post",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/posts/update/{{postId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "posts",
+            "update",
+            "{{postId}}"
+          ]
+        },
+        "description": "Run Create Post first so postId is set. Only supplied fields are updated. Name, description and age are the only accepted fields.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Updated using Postman\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Description updated', () => pm.expect(pm.response.json().post.description).to.eql('Updated using Postman'));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "7. Delete Post",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/posts/delete/{{postId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "posts",
+            "delete",
+            "{{postId}}"
+          ]
+        },
+        "description": "Deletes the post identified by postId. Run Get All Posts again to confirm removal. Repeating Delete for the same ID returns 404."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}
