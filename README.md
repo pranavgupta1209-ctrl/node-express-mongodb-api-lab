@@ -72,8 +72,7 @@ node-express-mongodb-api-lab/
 ├── .gitignore
 ├── package.json
 ├── package-lock.json
-├── README.md
-└── EVALUATION_GUIDE.md
+└── README.md
 ```
 
 The locally created `.env` and installed `node_modules/` directory are ignored by Git. The small shared error handler avoids repeating error formatting. The test file verifies the database-backed behavior without adding complexity to the application.
@@ -164,7 +163,7 @@ Run the automated checks separately:
 npm.cmd test
 ```
 
-Tests launch their own disposable local MongoDB process and a temporary HTTP port. They do not read your Atlas data or need your Atlas password. They may download MongoDB on first use. They do not replace the assignment's Postman desktop demonstration. Actual verification results and remaining manual checks are recorded in `EVALUATION_GUIDE.md`.
+Tests launch their own disposable local MongoDB process and a temporary HTTP port. They do not read your Atlas data or need your Atlas password. They may download MongoDB on first use. They do not replace the assignment's Postman desktop demonstration.
 
 ## 11. API Endpoints
 
@@ -290,8 +289,6 @@ Request flow:
 Postman → Express route → Controller → Mongoose model → MongoDB Atlas
         ← JSON response ← Controller ← Database result ←
 ```
-
-For simple Hinglish explanations, a practical demonstration script, file walkthrough and viva questions, read `EVALUATION_GUIDE.md`.
 
 ## 17. Troubleshooting
 
